@@ -12,4 +12,13 @@
     <string name="password">Password</string>
     <string name="state_image">State image</string>
     <string name="exit">Exit</string>
+    <string name="logo_image">Logo image</string>
+    <string name="labsec">LabSec</string>
+    <string name="login">Login</string>
+    <string name="labs_list">Labs list</string>
+    <string name="lab_form">Lab form</string>
+    <string name="device_list">Device list</string>
+    <string name="device_form">Device form</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

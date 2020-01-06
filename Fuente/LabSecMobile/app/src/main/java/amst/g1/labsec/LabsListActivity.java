@@ -18,10 +18,14 @@ import android.view.ViewGroup;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.database.SnapshotParser;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -68,24 +72,32 @@ public class LabsListActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.menuItemExit) {
             FirebaseInstanceId.getInstance().getInstanceId()
-                    .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                            if (!task.isSuccessful()) {
-                                Log.w("Instance", "getInstanceId failed",
-                                        task.getException());
-                                return;
-                            }
-                            String token = Objects.requireNonNull(task.getResult()).getToken();
-                            FirebaseDatabase.getInstance().getReference()
-                                    .child("tokens").child(token).removeValue();
-                            FirebaseAuth.getInstance().signOut();
-                            Intent intent = new Intent(getApplicationContext(),
-                                    LoginActivity.class);
-                            startActivity(intent);
-                            finish();
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w("Instance", "getInstanceId failed",
+                                    task.getException());
+                            return;
                         }
-                    });
+                        String token = Objects.requireNonNull(task.getResult()).getToken();
+                        FirebaseDatabase.getInstance().getReference()
+                                .child("tokens").child(token).removeValue();
+
+                        FirebaseAuth.getInstance().signOut();
+
+                        GoogleSignInOptions gso = new GoogleSignInOptions
+                                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                .requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
+                        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(getApplicationContext(), gso);
+                        mGoogleSignInClient.signOut();
+
+                        Intent intent = new Intent(getApplicationContext(),
+                                LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -97,23 +109,25 @@ public class LabsListActivity extends AppCompatActivity {
                 .child("labs");
 
         FirebaseRecyclerOptions<Lab> options =
-                new FirebaseRecyclerOptions.Builder<Lab>()
-                        .setQuery(query, new SnapshotParser<Lab>() {
-                            @NonNull
-                            @Override
-                            public Lab parseSnapshot(@NonNull DataSnapshot snapshot) {
-                                String id = Objects.requireNonNull(snapshot.child("id").getValue()).toString();
-                                String name = Objects.requireNonNull(snapshot.child("name").getValue()).toString();
-                                String description = Objects.requireNonNull(snapshot.child("description").getValue())
-                                        .toString();
-                                String location = Objects.requireNonNull(snapshot.child("location").getValue()).toString();
-                                String inCharge = Objects.requireNonNull(snapshot.child("inCharge").getValue()).toString();
-                                Lab lab = new Lab(id, name, description, location, inCharge);
-                                Log.v("TEST", lab.toString());
-                                return lab;
-                            }
-                        })
-                        .build();
+            new FirebaseRecyclerOptions.Builder<Lab>()
+                .setQuery(query, new SnapshotParser<Lab>() {
+                    @NonNull
+                    @Override
+                    public Lab parseSnapshot(@NonNull DataSnapshot snapshot) {
+                        String id = Objects.requireNonNull(snapshot.child("id").getValue())
+                                .toString();
+                        String name = Objects.requireNonNull(snapshot.child("name").getValue())
+                                .toString();
+                        String description = Objects.requireNonNull(snapshot.child("description")
+                                .getValue()).toString();
+                        String location = Objects.requireNonNull(snapshot.child("location")
+                                .getValue()).toString();
+                        String inCharge = Objects.requireNonNull(snapshot.child("inCharge")
+                                .getValue()).toString();
+                        return new Lab(id, name, description, location, inCharge);
+                    }
+                })
+                .build();
 
         adapter = new FirebaseRecyclerAdapter<Lab, LabViewHolder>(options) {
 
@@ -129,7 +143,16 @@ public class LabsListActivity extends AppCompatActivity {
                     binding.rvLabList.setVisibility(View.VISIBLE);
                     binding.tvLabsListNoLabs.setVisibility(View.GONE);
                 }
+            }
 
+            @Override
+            public void onError(@NonNull DatabaseError error) {
+                Log.v("TEST", error.toString());
+                binding.pbLabsList.setVisibility(View.GONE);
+                binding.tvLabsListNoLabs.setText(error.toString());
+                binding.tvLabsListNoLabs.setVisibility(View.VISIBLE);
+                binding.rvLabList.setVisibility(View.GONE);
+                super.onError(error);
             }
 
             @NonNull

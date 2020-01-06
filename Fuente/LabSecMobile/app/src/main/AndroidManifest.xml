@@ -4,36 +4,36 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:fullBackupContent="@xml/backup_descriptor">
+        android:theme="@style/AppTheme">
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_stat_icon" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="LabSecChannel" />
 
-        <activity android:name=".DeviceFormActivity"/>
-        <activity android:name=".DeviceListActivity" />
-        <activity android:name=".LabFormActivity" />
-        <activity android:name=".LabsListActivity" />
-        <activity android:name=".LoginActivity">
+        <activity android:name=".SplashActivity" android:theme="@style/AppThemeNoTitle">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
+        <activity android:name=".LoginActivity" android:theme="@style/AppThemeNoTitle" />
+        <activity android:name=".LabsListActivity" android:label="@string/labs_list" />
+        <activity android:name=".LabFormActivity" android:label="@string/lab_form" />
+        <activity android:name=".DeviceListActivity" android:label="@string/device_list" />
+        <activity android:name=".DeviceFormActivity" android:label="@string/device_form" />
+
         <service
             android:name=".MessageService"
             android:exported="false">

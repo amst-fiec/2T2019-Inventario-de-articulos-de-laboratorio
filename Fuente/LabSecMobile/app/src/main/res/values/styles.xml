@@ -6,6 +6,20 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textAppearance">@style/Title</item>
+    </style>
+
+    <style name="Title" parent="@android:style/TextAppearance">
+        <item name="android:textSize">40sp</item>
+        <item name="android:color">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="AppThemeNoTitle" parent="AppTheme">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
 </resources>
+

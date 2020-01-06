@@ -31,7 +31,7 @@ public class LabFormActivity extends AppCompatActivity {
                 if (lab.isValid())
                     createLab();
                 else
-                    Toast.makeText(getApplicationContext(), "Invalid data",
+                    Toast.makeText(getApplicationContext(), "All fields are required",
                             Toast.LENGTH_SHORT).show();
             }
         });
