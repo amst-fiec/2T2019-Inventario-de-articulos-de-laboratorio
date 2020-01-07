@@ -21,18 +21,18 @@
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="LabSecChannel" />
 
-        <activity android:name=".SplashActivity" android:theme="@style/AppThemeNoTitle">
+        <activity android:name=".activities.SplashActivity" android:theme="@style/AppThemeNoTitle">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity" android:theme="@style/AppThemeNoTitle" />
-        <activity android:name=".LabsListActivity" android:label="@string/labs_list" />
-        <activity android:name=".LabFormActivity" android:label="@string/lab_form" />
-        <activity android:name=".DeviceListActivity" android:label="@string/device_list" />
-        <activity android:name=".DeviceFormActivity" android:label="@string/device_form" />
+        <activity android:name=".activities.LoginActivity" android:theme="@style/AppThemeNoTitle" />
+        <activity android:name=".activities.LabsListActivity" android:label="@string/labs_list" />
+        <activity android:name=".activities.LabFormActivity" android:label="@string/lab_form" />
+        <activity android:name=".activities.DeviceListActivity" android:label="@string/device_list" />
+        <activity android:name=".activities.DeviceFormActivity" android:label="@string/device_form" />
 
         <service
             android:name=".MessageService"

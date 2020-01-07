@@ -1,4 +1,4 @@
-package amst.g1.labsec;
+package amst.g1.labsec.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,6 +33,7 @@ import com.google.firebase.iid.InstanceIdResult;
 
 import java.util.Objects;
 
+import amst.g1.labsec.R;
 import amst.g1.labsec.databinding.ActivityLabsListBinding;
 import amst.g1.labsec.models.Lab;
 import amst.g1.labsec.viewholders.LabViewHolder;

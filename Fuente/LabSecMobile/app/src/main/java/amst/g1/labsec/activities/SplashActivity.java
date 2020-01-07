@@ -1,4 +1,4 @@
-package amst.g1.labsec;
+package amst.g1.labsec.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +17,8 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
 import java.util.Objects;
+
+import amst.g1.labsec.R;
 
 
 public class SplashActivity extends AppCompatActivity {

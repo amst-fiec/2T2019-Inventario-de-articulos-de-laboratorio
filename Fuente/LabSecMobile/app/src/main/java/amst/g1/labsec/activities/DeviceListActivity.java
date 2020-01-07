@@ -1,4 +1,4 @@
-package amst.g1.labsec;
+package amst.g1.labsec.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,6 +27,7 @@ import com.google.firebase.database.Query;
 
 import java.util.Objects;
 
+import amst.g1.labsec.R;
 import amst.g1.labsec.databinding.ActivityDeviceListBinding;
 import amst.g1.labsec.models.Device;
 import amst.g1.labsec.viewholders.DeviceViewHolder;

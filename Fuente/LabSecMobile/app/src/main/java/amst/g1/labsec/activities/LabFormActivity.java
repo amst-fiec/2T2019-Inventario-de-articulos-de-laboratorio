@@ -1,4 +1,4 @@
-package amst.g1.labsec;
+package amst.g1.labsec.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -13,6 +13,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.HashMap;
 import java.util.Map;
 
+import amst.g1.labsec.R;
 import amst.g1.labsec.databinding.ActivityLabFormBinding;
 import amst.g1.labsec.models.Lab;
 
