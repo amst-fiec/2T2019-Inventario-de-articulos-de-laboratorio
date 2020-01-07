@@ -8,7 +8,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/labsec"
+        android:background="@drawable/background"
         tools:context=".activities.LoginActivity">
 
         <LinearLayout
@@ -16,13 +16,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="256dp"
             android:layout_marginEnd="24dp"
             android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="@+id/gHLogin">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
@@ -66,11 +64,12 @@
 
         <ProgressBar
             android:id="@+id/pbLogin"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:indeterminate="true"
             android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/fabGmail"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout"
@@ -94,12 +93,19 @@
             android:layout_width="300dp"
             android:layout_height="300dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/logo_test"
+            android:src="@drawable/logo"
             android:contentDescription="@string/logo_image"
             app:layout_constraintBottom_toTopOf="@+id/linearLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/gHLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent=".6" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
