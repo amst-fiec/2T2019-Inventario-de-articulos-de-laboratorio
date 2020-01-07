@@ -8,15 +8,16 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="256dp"
-        android:layout_height="256dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:adjustViewBounds="true"
+        android:contentDescription="@string/logo_image"
         android:scaleType="fitCenter"
         android:src="@drawable/logo"
-        android:contentDescription="@string/logo_image"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintDimensionRatio="w,1:1"
+        app:layout_constraintEnd_toStartOf="@+id/gV2Splash"
+        app:layout_constraintStart_toStartOf="@+id/gV1Splash"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
@@ -30,14 +31,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
-    <TextView
-        android:id="@+id/textView"
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gV1Splash"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="@string/labsec"
-        style="@style/Title"
-        app:layout_constraintBottom_toTopOf="@+id/imageView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".1" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gV2Splash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".9" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
