@@ -16,6 +16,8 @@ public class DeviceViewHolder extends RecyclerView.ViewHolder {
     public final TextView tvName;
     public final TextView tvBrand;
     public final TextView tvModel;
+    public final TextView tvBorrower;
+    public final TextView tvReturnDate;
     public final ImageView ivState;
 
     public DeviceViewHolder(@NonNull View itemView) {
@@ -25,5 +27,7 @@ public class DeviceViewHolder extends RecyclerView.ViewHolder {
         tvName = itemView.findViewById(R.id.tvItemDeviceName);
         tvBrand= itemView.findViewById(R.id.tvItemDeviceBrand);
         tvModel= itemView.findViewById(R.id.tvItemDeviceModel);
+        tvBorrower= itemView.findViewById(R.id.tvItemDeviceBorrower);
+        tvReturnDate= itemView.findViewById(R.id.tvItemDeviceReturnDate);
     }
 }

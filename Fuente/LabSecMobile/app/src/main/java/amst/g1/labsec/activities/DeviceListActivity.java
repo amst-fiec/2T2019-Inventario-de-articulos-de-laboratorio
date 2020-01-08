@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,18 +14,25 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.database.SnapshotParser;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.Objects;
 
 import amst.g1.labsec.R;
@@ -89,11 +97,13 @@ public class DeviceListActivity extends AppCompatActivity {
                                 String name = Objects.requireNonNull(snapshot.child("name").getValue()).toString();
                                 String brand = Objects.requireNonNull(snapshot.child("brand").getValue()).toString();
                                 String model = Objects.requireNonNull(snapshot.child("model").getValue()).toString();
-//                                String borrower = snapshot.child("borrower").getValue().toString();
                                 String state = Objects.requireNonNull(snapshot.child("state").getValue()).toString();
-//                                Date returnDate = new Date(Long.parseLong(snapshot
-//                                        .child("returnDate").getValue().toString()));
-                                return new Device(id, name, brand, model, state);
+                                Device device = new Device(id, name, brand, model, state);
+                                if (device.getState().equals("Borrowed")) {
+                                    device.setBorrower(Objects.requireNonNull(snapshot.child("borrower").getValue()).toString());
+                                    device.setReturnDate(Objects.requireNonNull(snapshot.child("returnDate").getValue()).toString());
+                                }
+                                return device;
                             }
                         })
                         .build();
@@ -146,6 +156,10 @@ public class DeviceListActivity extends AppCompatActivity {
                         break;
                     case "Borrowed":
                         holder.ivState.setImageResource(R.drawable.ic_access_time_yellow);
+                        holder.tvBorrower.setVisibility(View.VISIBLE);
+                        holder.tvReturnDate.setVisibility(View.VISIBLE);
+                        holder.tvBorrower.setText(model.getBorrower());
+                        holder.tvReturnDate.setText(model.getReturnDate());
                         next = "Available";
                         break;
                     case "Moved":
@@ -159,49 +173,153 @@ public class DeviceListActivity extends AppCompatActivity {
                 holder.cvRoot.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-
-                        // Add the buttons
-                        builder.setPositiveButton(mContext.getString(R.string.yes),
-                                new DialogInterface.OnClickListener() {
-                            public void onClick(final DialogInterface dialog, int id) {
-                                // User clicked OK button
-                                FirebaseDatabase.getInstance().getReference().child("labs")
-                                    .child(labId).child("devices").child(model.getId())
-                                    .child("state").setValue(nextState)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            dialog.dismiss();
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                            }
-                        });
-                        builder.setNegativeButton(mContext.getString(R.string.no),
-                                new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.dismiss();
-                            }
-                        });
-
-                        builder.setMessage( String.format("Change %s %s state to %s?",
-                                model.getName(), model.getBrand(), nextState));
-
-                        // Create the AlertDialog
-                        AlertDialog dialog = builder.create();
-                        dialog.show();
+                        buildConfirmationDialog(nextState, model);
                     }
                 });
             }
 
         };
 
+    }
+
+    private void buildConfirmationDialog(final String nextState, final Device model) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+
+        builder.setPositiveButton(mContext.getString(R.string.yes),
+            new DialogInterface.OnClickListener() {
+                public void onClick(final DialogInterface dialog, int id) {
+                    if (!nextState.equals("Borrowed")) {
+                        FirebaseDatabase.getInstance().getReference().child("labs")
+                            .child(labId).child("devices").child(model.getId())
+                            .child("state").setValue(nextState)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    } else {
+                        buildBorrowInfoDialog(model);
+                    }
+                }
+            });
+
+        builder.setNegativeButton(mContext.getString(R.string.no),
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                }
+            });
+
+        builder.setMessage(String.format("Change %s %s state to %s?",
+                model.getName(), model.getBrand(), nextState));
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void buildBorrowInfoDialog(final Device model) {
+        @SuppressLint("InflateParams")
+        View view = LayoutInflater.from(mContext).inflate(R.layout.activity_borrow, null);
+
+        final EditText etReturnDate = view.findViewById(R.id.etBorrowReturnDate);
+        etReturnDate.setFocusable(false);
+        etReturnDate.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Calendar now = Calendar.getInstance();
+                    DatePickerDialog dpd = DatePickerDialog.newInstance(
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePickerDialog view, int year, int monthOfYear,
+                                                  int dayOfMonth) {
+                                final String selectedDate = String.format(Locale.getDefault(),
+                                        "%d/%d/%d", dayOfMonth, monthOfYear + 1,
+                                        year);
+                                etReturnDate.setText(selectedDate);
+                                etReturnDate.setError(null);
+                            }
+                        },
+                        now.get(Calendar.YEAR),
+                        now.get(Calendar.MONTH),
+                        now.get(Calendar.DAY_OF_MONTH)
+                    );
+                    dpd.setMinDate(Calendar.getInstance());
+                    dpd.show(getFragmentManager(), "Datepickerdialog");
+                }
+            }
+        );
+
+        final EditText etBorrower = view.findViewById(R.id.etBorrowBorrower);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+
+        builder.setNegativeButton(mContext.getString(R.string.cancel),
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            });
+
+        builder.setPositiveButton(mContext.getString(R.string.borrow), null);
+
+        builder.setTitle("Borrow details");
+        builder.setCancelable(false);
+        builder.setView(view);
+
+        AlertDialog dialog2 = builder.create();
+        dialog2.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(final DialogInterface dialogInterface) {
+                Button button = ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE);
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String borrower = etBorrower.getText().toString();
+                        String returnDate = etReturnDate.getText().toString();
+                        if (borrower.equals(""))
+                            etBorrower.setError("This field is required");
+                        if (returnDate.equals(""))
+                            etReturnDate.setError("This field is required");
+                        if (borrower.equals("") || returnDate.equals(""))
+                            return;
+                        try {
+                            model.setState("Borrowed");
+                            model.setBorrower(borrower);
+                            model.setReturnDate(returnDate);
+                            FirebaseDatabase.getInstance().getReference().child("labs")
+                                .child(labId).child("devices").child(model.getId())
+                                .setValue(model).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        dialogInterface.dismiss();
+                                    }
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(mContext, e.getLocalizedMessage(),
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } catch (Exception ex) {
+                            Toast.makeText(mContext, ex.getLocalizedMessage(), Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+
+                    }
+                });
+            }
+        });
+        dialog2.show();
     }
 
     @Override

@@ -12,7 +12,7 @@ public class Device {
     private String model;
     private String borrower;
     private String state;
-    private Date returnDate;
+    private String returnDate;
 
     public Device() {
         this.state = "Available";
@@ -73,11 +73,11 @@ public class Device {
         this.borrower = borrower;
     }
 
-    public Date getReturnDate() {
+    public String getReturnDate() {
         return returnDate;
     }
 
-    public void setReturnDate(Date returnDate) {
+    public void setReturnDate(String returnDate) {
         this.returnDate = returnDate;
     }
 

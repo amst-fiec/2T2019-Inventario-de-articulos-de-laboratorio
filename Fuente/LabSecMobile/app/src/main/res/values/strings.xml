@@ -21,4 +21,8 @@
     <string name="device_form">Device form</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="return_date">Return date</string>
+    <string name="borrower">Borrower</string>
+    <string name="borrow">Borrow</string>
+    <string name="cancel">Cancel</string>
 </resources>
