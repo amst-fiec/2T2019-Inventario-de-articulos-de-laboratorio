@@ -2,8 +2,6 @@ package amst.g1.labsec.models;
 
 import androidx.annotation.NonNull;
 
-import java.util.Date;
-
 public class Device {
 
     private String id;
