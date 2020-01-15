@@ -38,6 +38,8 @@ dependencies {
 
     implementation 'com.firebaseui:firebase-ui-database:6.1.0'
 
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
     implementation 'com.wdullaer:materialdatetimepicker:3.6.4'
 
     testImplementation 'junit:junit:4.12'

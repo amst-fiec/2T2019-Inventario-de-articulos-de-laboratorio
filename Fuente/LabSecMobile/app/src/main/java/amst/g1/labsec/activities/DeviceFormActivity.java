@@ -52,6 +52,7 @@ public class DeviceFormActivity extends AppCompatActivity {
             map.put("model", device.getModel());
             map.put("brand", device.getBrand());
             map.put("state", device.getState());
+            map.put("battery", Integer.toHexString(device.getBattery()));
             databaseReference.setValue(map);
             Toast.makeText(getApplicationContext(), "Device created",
                     Toast.LENGTH_SHORT).show();

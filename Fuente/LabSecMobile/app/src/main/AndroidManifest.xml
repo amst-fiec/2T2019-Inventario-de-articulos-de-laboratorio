@@ -14,17 +14,14 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_stat_icon" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="LabSecChannel" />
 
-        <activity
-            android:name=".activities.SplashActivity">
+        <activity android:name=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -32,26 +29,23 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".activities.LoginActivity" />
-
+        <activity android:name=".activities.LoginActivity" />
         <activity
             android:name=".activities.LabsListActivity"
             android:label="@string/labs_list" />
-
+        <activity android:name=".activities.ProfileActivity"
+            android:label="@string/profile"/>
         <activity
             android:name=".activities.LabFormActivity"
             android:label="@string/lab_form" />
-
         <activity
             android:name=".activities.DeviceListActivity"
             android:label="@string/device_list" />
-
         <activity
             android:name=".activities.DeviceFormActivity"
             android:label="@string/device_form" />
-
-        <activity android:name=".activities.BorrowActivity"
+        <activity
+            android:name=".activities.BorrowActivity"
             android:excludeFromRecents="true"
             android:theme="@style/Theme.AppCompat.Dialog" />
 
@@ -62,7 +56,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
     </application>
 
 </manifest>

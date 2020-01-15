@@ -10,7 +10,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +32,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
@@ -93,17 +99,37 @@ public class DeviceListActivity extends AppCompatActivity {
                             @NonNull
                             @Override
                             public Device parseSnapshot(@NonNull DataSnapshot snapshot) {
-                                String id = Objects.requireNonNull(snapshot.child("id").getValue()).toString();
-                                String name = Objects.requireNonNull(snapshot.child("name").getValue()).toString();
-                                String brand = Objects.requireNonNull(snapshot.child("brand").getValue()).toString();
-                                String model = Objects.requireNonNull(snapshot.child("model").getValue()).toString();
-                                String state = Objects.requireNonNull(snapshot.child("state").getValue()).toString();
-                                Device device = new Device(id, name, brand, model, state);
-                                if (device.getState().equals("Borrowed")) {
-                                    device.setBorrower(Objects.requireNonNull(snapshot.child("borrower").getValue()).toString());
-                                    device.setReturnDate(Objects.requireNonNull(snapshot.child("returnDate").getValue()).toString());
+                                if (snapshot.hasChild("id") && snapshot.hasChild("name")
+                                        && snapshot.hasChild("brand") &&
+                                        snapshot.hasChild("model") &&
+                                        snapshot.hasChild("state") &&
+                                        snapshot.hasChild("battery")) {
+                                    String id = Objects.requireNonNull(snapshot
+                                            .child("id").getValue()).toString();
+                                    String name = Objects.requireNonNull(snapshot
+                                            .child("name").getValue()).toString();
+                                    String brand = Objects.requireNonNull(snapshot
+                                            .child("brand").getValue()).toString();
+                                    String model = Objects.requireNonNull(snapshot
+                                            .child("model").getValue()).toString();
+                                    String state = Objects.requireNonNull(snapshot
+                                            .child("state").getValue()).toString();
+                                    String batteryString = Objects.requireNonNull(snapshot
+                                            .child("battery").getValue()).toString();
+                                    int battery = 0;
+                                    try {
+                                        battery = Integer.decode(batteryString);
+                                    } catch (Exception ignored) {}
+                                    Device device = new Device(id, name, brand, model, state, battery);
+                                    if (device.getState().equals("Borrowed")) {
+                                        device.setBorrower(Objects.requireNonNull(
+                                                snapshot.child("borrower").getValue()).toString());
+                                        device.setReturnDate(Objects.requireNonNull(
+                                                snapshot.child("returnDate").getValue()).toString());
+                                    }
+                                    return device;
                                 }
-                                return device;
+                                return new Device();
                             }
                         })
                         .build();
@@ -144,38 +170,60 @@ public class DeviceListActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull DeviceViewHolder holder, final int position,
                                             @NonNull final Device model) {
-                holder.tvName.setText(model.getName());
-                holder.tvBrand.setText(model.getBrand());
-                holder.tvModel.setText(model.getModel());
+                if (model.getId() == null) {
+                    holder.cvRoot.setVisibility(View.GONE);
+                } else {
+                    holder.tvName.setText(model.getName());
+                    holder.tvBrand.setText(model.getBrand());
+                    holder.tvModel.setText(model.getModel());
+                    holder.pbBattery.setProgress(model.getBattery());
 
-                String next = "";
-                switch (model.getState()) {
-                    case "Available":
-                        holder.ivState.setImageResource(R.drawable.ic_check_green);
-                        next = "Borrowed";
-                        break;
-                    case "Borrowed":
-                        holder.ivState.setImageResource(R.drawable.ic_access_time_yellow);
-                        holder.tvBorrower.setVisibility(View.VISIBLE);
-                        holder.tvReturnDate.setVisibility(View.VISIBLE);
-                        holder.tvBorrower.setText(model.getBorrower());
-                        holder.tvReturnDate.setText(model.getReturnDate());
-                        next = "Available";
-                        break;
-                    case "Moved":
-                        holder.ivState.setImageResource(R.drawable.ic_error_outline_red);
-                        next = "Available";
-                        break;
-                }
-
-                final String nextState = next;
-
-                holder.cvRoot.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        buildConfirmationDialog(nextState, model);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        int battery = model.getBattery();
+                        ColorStateList colorStateList = ColorStateList.valueOf(
+                                Color.parseColor("#092354"));
+                        if (battery > 0 && battery <= 15) {
+                            colorStateList = ColorStateList.valueOf(
+                                    Color.parseColor("#BE0002"));
+                        } else if (battery > 15 && battery <= 40) {
+                            colorStateList = ColorStateList.valueOf(
+                                    Color.parseColor("#D5D700"));
+                        } else if (battery > 40) {
+                            colorStateList = ColorStateList.valueOf(
+                                    Color.parseColor("#00BE11"));
+                        }
+                        holder.pbBattery.setProgressTintList(colorStateList);
                     }
-                });
+
+                    String next = "";
+                    switch (model.getState()) {
+                        case "Available":
+                            holder.ivState.setImageResource(R.drawable.ic_check_green);
+                            next = "Borrowed";
+                            break;
+                        case "Borrowed":
+                            holder.ivState.setImageResource(R.drawable.ic_access_time_yellow);
+                            holder.tvBorrower.setVisibility(View.VISIBLE);
+                            holder.tvReturnDate.setVisibility(View.VISIBLE);
+                            holder.tvBorrower.setText(model.getBorrower());
+                            holder.tvReturnDate.setText(model.getReturnDate());
+                            next = "Available";
+                            break;
+                        case "Moved":
+                            holder.ivState.setImageResource(R.drawable.ic_error_outline_red);
+                            next = "Available";
+                            break;
+                    }
+
+                    final String nextState = next;
+
+                    holder.cvRoot.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            buildConfirmationDialog(nextState, model);
+                        }
+                    });
+                }
             }
 
         };
@@ -294,22 +342,15 @@ public class DeviceListActivity extends AppCompatActivity {
                             model.setState("Borrowed");
                             model.setBorrower(borrower);
                             model.setReturnDate(returnDate);
-                            FirebaseDatabase.getInstance().getReference().child("labs")
-                                .child(labId).child("devices").child(model.getId())
-                                .setValue(model).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        dialogInterface.dismiss();
-                                    }
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(mContext, e.getLocalizedMessage(),
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("labs")
+                                .child(labId).child("devices").child(model.getId());
+
+                            reference.child("state").setValue(model.getState());
+                            reference.child("borrower").setValue(model.getBorrower());
+                            reference.child("returnDate").setValue(model.getReturnDate());
+
+                            dialogInterface.dismiss();
+
                         } catch (Exception ex) {
                             Toast.makeText(mContext, ex.getLocalizedMessage(), Toast.LENGTH_SHORT)
                                     .show();

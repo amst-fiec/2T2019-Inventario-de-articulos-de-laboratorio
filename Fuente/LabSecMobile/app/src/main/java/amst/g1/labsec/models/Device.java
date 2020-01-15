@@ -11,6 +11,7 @@ public class Device {
     private String borrower;
     private String state;
     private String returnDate;
+    private int battery;
 
     public Device() {
         this.state = "Available";
@@ -23,12 +24,13 @@ public class Device {
         this.model = model;
     }
 
-    public Device(String id, String name, String brand, String model, String state) {
+    public Device(String id, String name, String brand, String model, String state, int battery) {
         this.id = id;
         this.name = name;
         this.brand = brand;
         this.model = model;
         this.state = state;
+        this.battery = battery;
     }
 
     public String getId() {
@@ -87,6 +89,14 @@ public class Device {
         this.state = state;
     }
 
+    public int getBattery() {
+        return battery;
+    }
+
+    public void setBattery(int battery) {
+        this.battery = battery;
+    }
+
     public boolean isValid() {
         boolean validName = name != null && !name.equals("");
         boolean validBrand = brand != null && !brand.equals("");
@@ -104,7 +114,8 @@ public class Device {
                 ", model='" + model + '\'' +
                 ", borrower='" + borrower + '\'' +
                 ", state='" + state + '\'' +
-                ", returnDate=" + returnDate +
+                ", returnDate=" + returnDate + '\'' +
+                ", battery='" + battery +
                 '}';
     }
 }

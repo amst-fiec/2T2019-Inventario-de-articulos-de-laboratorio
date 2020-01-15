@@ -2,6 +2,7 @@ package amst.g1.labsec.viewholders;
 
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,7 @@ public class DeviceViewHolder extends RecyclerView.ViewHolder {
     public final TextView tvBorrower;
     public final TextView tvReturnDate;
     public final ImageView ivState;
+    public final ProgressBar pbBattery;
 
     public DeviceViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -29,5 +31,6 @@ public class DeviceViewHolder extends RecyclerView.ViewHolder {
         tvModel= itemView.findViewById(R.id.tvItemDeviceModel);
         tvBorrower= itemView.findViewById(R.id.tvItemDeviceBorrower);
         tvReturnDate= itemView.findViewById(R.id.tvItemDeviceReturnDate);
+        pbBattery= itemView.findViewById(R.id.pbItemDeviceBattery);
     }
 }

@@ -38,7 +38,7 @@ exports.changeStatus = functions.https.onRequest(async (req, res) => {
                     //change it to available...
                     break;
                 case 'Moved':
-                    await snapshot.child('state').ref.set('Available');
+                    //... 
                     break;
             }
             return res.status(200).send('Ok');

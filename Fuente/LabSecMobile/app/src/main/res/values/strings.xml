@@ -25,4 +25,6 @@
     <string name="borrower">Borrower</string>
     <string name="borrow">Borrow</string>
     <string name="cancel">Cancel</string>
+    <string name="profile">Profile</string>
+    <string name="profile_photo">Profile photo</string>
 </resources>
